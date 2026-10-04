@@ -1,0 +1,28 @@
+{
+  "slug": "sera-notes-insight-demo",
+  "name": "Sera Notes Insight",
+  "oneLiner": {
+    "zh": "让你的笔记不只是记住，而是主动发现——公开产品详情页 + 合成数据可交互 demo。",
+    "en": "Turn your notes into a system that notices what you missed — public product page + interactive synthetic demo."
+  },
+  "type": "product demo page (Vite + React) + content production pack",
+  "status": "public demo · honest synthetic data",
+  "repo": "https://github.com/78tyih/sera-notes-insight-demo",
+  "showcase": "https://78tyih.github.io/sera-notes-insight-demo/showcase.html",
+  "liveDemo": "https://78tyih.github.io/sera-notes-insight-demo/",
+  "fourQuestions": {
+    "problem": "笔记工具都擅长存，没人帮你在回看时发现：观点演化、反复问题、隐藏连接、未命名矛盾。",
+    "scenarioOutcome": "投资人/用户 30 秒看懂产品主张；每条洞察点开即有证据链（note id + 日期 + 原文摘录）；内容团队直接拿 CONTENT_PRODUCTION_PACK.md 开工。",
+    "architecture": "Vite + React 三件套：main.jsx（页面组装/交互）、styles.css（明暗主题/响应式）、data/demoData.js（6 合成笔记 / 4 洞察 / 8 Lens）。展示层不碰插件核心；接真实数据=换 API adapter。",
+    "reuse": "① insight 数据形状（id/type/summary/evidence[]）可当产品设计模板；② Synthetic Demo Vault 诚实展示法；③ 洞察→证据跳转交互；④ 内容生产包模板。"
+  },
+  "demoFacts": {
+    "notes": 6,
+    "insights": ["观点演化 evolution", "反复问题 recurring", "隐藏连接 connection", "观点矛盾 contradiction"],
+    "lenses": 8,
+    "dataIsSynthetic": true
+  },
+  "links": {
+    "source": ["src/main.jsx", "src/data/demoData.js", "CONTENT_PRODUCTION_PACK.md"]
+  }
+}

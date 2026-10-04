@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Sera Notes Insight — 让笔记主动发现 · 交互展示</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAFAF8; --panel:#FFFFFF; --ink:#15181D; --ink2:#545A66; --ink3:#8C929E;
+  --hairline:rgba(21,24,29,.13); --accent:#2563EB; --accent-soft:rgba(37,99,235,.07);
+  --mono:"JetBrains Mono",ui-monospace,monospace; --font-body:"Inter","Noto Sans SC",system-ui,sans-serif;
+}
+html[data-theme="dark"]{
+  --paper:#111318; --panel:#191C23; --ink:#E6E9EF; --ink2:#A6ACB9; --ink3:#666C79;
+  --hairline:rgba(230,233,239,.14); --accent:#5B8DEF; --accent-soft:rgba(91,141,239,.1);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);margin:0;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 34px}
+.en{display:none} html[data-lang="en"] .en{display:inline} html[data-lang="en"] .zh{display:none}
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--hairline)}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:15px 34px;max-width:1080px;margin:0 auto}
+.logo{font-size:14px;font-weight:600;text-decoration:none;color:var(--ink)}
+.logo b{color:var(--accent)}
+.hd-right{display:flex;gap:8px}
+.tgl{border:1px solid var(--hairline);background:transparent;color:var(--ink2);padding:5px 13px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-body)}
+.tgl:hover{color:var(--ink);border-color:var(--ink3)} .tgl.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.hero{padding:80px 0 56px;border-bottom:1px solid var(--hairline)}
+.kicker{display:flex;align-items:center;gap:14px;font-size:11px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink2);font-family:var(--mono)}
+.kicker::before{content:"";width:34px;height:1px;background:var(--ink3)}
+h1{font-size:clamp(2.1rem,4.4vw,3.2rem);line-height:1.16;letter-spacing:-.01em;font-weight:600;margin:22px 0 0;max-width:24ch}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{max-width:62ch;color:var(--ink2);font-size:15px;margin:18px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:0;margin-top:24px}
+.chip{border:1px solid var(--hairline);padding:7px 15px;font-size:11.5px;color:var(--ink2);background:var(--panel);font-family:var(--mono);letter-spacing:.06em}
+.chip+.chip{border-left:0} .chip b{color:var(--accent);font-weight:500}
+.cta{display:flex;gap:0;margin-top:28px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid var(--ink);background:transparent;color:var(--ink);transition:all .15s ease}
+.btn--accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn+.btn{border-left:0}
+.btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+section{padding:60px 0;border-bottom:1px solid var(--hairline)}
+.sec-no{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--accent);text-transform:uppercase}
+h2{font-size:clamp(1.5rem,2.8vw,2.1rem);font-weight:600;margin:8px 0 0;letter-spacing:-.01em}
+h2 em{font-style:normal;color:var(--accent)}
+.sec-sub{color:var(--ink2);font-size:14px;margin-top:10px;max-width:66ch}
+/* demo frame */
+.demo-frame{border:1px solid var(--ink);box-shadow:6px 7px 0 rgba(0,0,0,.14);background:var(--panel);height:640px;position:relative;overflow:hidden}
+html[data-theme="dark"] .demo-frame{box-shadow:6px 7px 0 rgba(0,0,0,.5)}
+.demo-frame iframe{width:1280px;height:800px;border:0;position:absolute;left:50%;top:50%;margin-left:-496px;margin-top:-306px;transform:scale(.775);transform-origin:0 0;background:#fff}
+.demo-meta{display:flex;justify-content:space-between;gap:14px;padding:12px 2px 0;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+.demo-meta a{color:var(--accent);text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+/* insights */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--hairline);background:var(--panel)}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.ins{padding:24px 26px;border-right:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}
+.ins:nth-child(2n){border-right:0}
+@media(max-width:820px){.ins:nth-child(2n){border-right:1px solid var(--hairline)}.ins:last-child{border-bottom:0}}
+.ins .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+.ins h3{font-size:16.5px;font-weight:600;margin:8px 0 6px;letter-spacing:-.01em}
+.ins p{margin:0;font-size:13px;color:var(--ink2);line-height:1.7}
+.ins .signal{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent);background:var(--accent-soft);padding:3px 10px}
+/* lenses */
+.lenses{display:flex;flex-wrap:wrap;border:1px solid var(--hairline);background:var(--panel)}
+.lens{padding:14px 18px;border-right:1px solid var(--hairline);border-bottom:1px solid var(--hairline);flex:1 1 24%}
+@media(max-width:820px){.lens{flex:1 1 46%}}
+.lens b{display:block;font-size:13px;font-weight:600;color:var(--ink)}
+.lens span{font-size:11.5px;color:var(--ink3)}
+/* evidence */
+.ev{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:820px){.ev{grid-template-columns:1fr}}
+.ev-card{border:1px solid var(--hairline);background:var(--panel);padding:22px 24px}
+.ev-card b.hl{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.ev-card p{margin:0 0 10px;font-size:13.5px;color:var(--ink2)}
+.ev-quote{border-left:2px solid var(--accent);padding:4px 0 4px 14px;margin:10px 0;font-size:13px;color:var(--ink2)}
+.ev-quote i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:4px}
+.honest{border:1px solid var(--hairline);border-left:3px solid var(--accent);background:var(--accent-soft);padding:16px 20px;font-size:13px;color:var(--ink2);margin-top:20px}
+.honest b{color:var(--ink)}
+/* steps */
+.steps{border:1px solid var(--hairline);background:var(--panel)}
+.step{padding:16px 22px;border-bottom:1px solid var(--hairline);display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:baseline}
+.step:last-child{border-bottom:0}
+.step i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--accent);letter-spacing:.14em}
+.step p{margin:0;font-size:13.5px;color:var(--ink2)}
+.step code{font-family:var(--mono);font-size:12px;background:var(--accent-soft);padding:1px 7px;color:var(--ink)}
+/* faq */
+.faq{border:1px solid var(--hairline);background:var(--panel)}
+details.faq-item{border-bottom:1px solid var(--hairline)}
+details.faq-item:last-child{border-bottom:0}
+details.faq-item summary{cursor:pointer;list-style:none;display:flex;gap:16px;align-items:baseline;padding:17px 20px}
+details.faq-item summary::-webkit-details-marker{display:none}
+details.faq-item summary:hover .qt{color:var(--accent)}
+details.faq-item summary .qm{font-family:var(--mono);color:var(--accent);font-size:10.5px;letter-spacing:.22em;min-width:52px;text-transform:uppercase}
+details.faq-item summary .qt{flex:1;font-size:15.5px;font-weight:500}
+details.faq-item summary .qc{color:var(--ink3);font-family:var(--mono);font-size:13px;transition:transform .15s ease}
+details.faq-item[open] summary .qc{transform:rotate(45deg)}
+details.faq-item .qa{padding:0 20px 20px 88px;color:var(--ink2);font-size:14px;line-height:1.75}
+details.faq-item .qa b{color:var(--ink)}
+@media(max-width:700px){details.faq-item .qa{padding-left:20px}}
+footer{padding:40px 0 56px;color:var(--ink3);font-size:12px}
+.fm{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header><div class="hd">
+  <a class="logo" href="#">Sera <b>Notes Insight</b></a>
+  <div class="hd-right">
+    <button class="tgl on" id="lang-zh" onclick="setLang('zh')">中</button>
+    <button class="tgl" id="lang-en" onclick="setLang('en')">EN</button>
+    <button class="tgl on" id="th-light" onclick="setTheme('light')">☀︎</button>
+    <button class="tgl" id="th-dark" onclick="setTheme('dark')">☾</button>
+  </div>
+</div></header>
+
+<div class="wrap">
+<section class="hero">
+  <div class="kicker">PUBLIC PRODUCT DEMO <span style="color:var(--ink3)">·</span> SYNTHETIC DEMO VAULT</div>
+  <h1><span class="zh">让你的笔记不只是记住，而是<em>主动发现</em></span><span class="en">Turn your notes into a system that <em>notices</em></span></h1>
+  <p class="sub"><span class="zh">Notes Insight 的公开产品详情页与 synthetic demo pack：观点怎么随时间演化、哪些问题反复出现、哪些项目暗中相连、哪里藏着未命名的矛盾。每条洞察都带证据链，可跳回原文。</span>
+  <span class="en">The public product page and synthetic demo pack for Notes Insight: how opinions evolve, which questions recur, which projects secretly connect, where unnamed tensions hide — every insight backed by an evidence trail.</span></p>
+  <div class="chips">
+    <span class="chip"><b>4</b> <span class="zh">类洞察</span><span class="en">insight types</span></span>
+    <span class="chip"><b>8</b> <span class="zh">个分析 Lens</span><span class="en">lenses</span></span>
+    <span class="chip"><b>100%</b> <span class="zh">证据可跳转</span><span class="en">evidence-linked</span></span>
+    <span class="chip">Vite + React</span>
+  </div>
+  <div class="cta">
+    <a class="btn btn--accent" href="index.html" target="_blank"><span class="zh">在线玩 Demo ↗</span><span class="en">Open the live demo ↗</span></a>
+    <a class="btn" href="https://github.com/78tyih/sera-notes-insight-demo">GitHub</a>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="sec-no">01 · LIVE DEMO</div>
+  <h2><span class="zh">Demo 本体，<em>就在下面</em></span><span class="en">The demo itself, embedded</span></h2>
+  <p class="sec-sub"><span class="zh">这就是仓库构建出的页面本体（Vite 构建 + GitHub Pages 托管），不是截图。点卡片看证据链。</span>
+  <span class="en">This is the repo's built page (Vite build + GitHub Pages), not a screenshot. Click a card to trace its evidence.</span></p>
+  <div class="demo-frame" style="margin-top:22px"><iframe id="demo-iframe" title="notes insight demo" loading="lazy"></iframe></div>
+  <div class="demo-meta">
+    <span>docs/index.html · 1280×800 · scale .775</span>
+    <a href="index.html" target="_blank"><span class="zh">新窗口打开 ↗</span><span class="en">OPEN FULL PAGE ↗</span></a>
+  </div>
+</section>
+
+<section id="finds">
+  <div class="sec-no">02 · WHAT IT FINDS</div>
+  <h2><span class="zh">四类<em>主动发现</em></span><span class="en">Four things it notices</span></h2>
+  <p class="sec-sub"><span class="zh">下面是 Demo Vault 里真实呈现的四条洞察（文案逐字取自 src/data/demoData.js）：</span>
+  <span class="en">The four insights shown in the demo vault (copy verbatim from src/data/demoData.js):</span></p>
+  <div class="grid" style="margin-top:22px">
+    <div class="ins"><span class="eyebrow"><span class="zh">观点演化</span><span class="en">EVOLUTION</span></span>
+      <h3><span class="zh">你的观点变了，但不是突然变的。</span><span class="en">Your opinions changed — gradually.</span></h3>
+      <p><span class="zh">从「平台先行」到「能力先行」，这条变化在 18 个月里反复出现。</span><span class="en">From "platform first" to "capability first" — recurring across 18 months.</span></p>
+      <span class="signal"><span class="zh">3 次转向</span><span class="en">3 pivots</span></span></div>
+    <div class="ins"><span class="eyebrow"><span class="zh">反复问题</span><span class="en">RECURRING</span></span>
+      <h3><span class="zh">你一直在问同一个问题。</span><span class="en">You keep asking the same question.</span></h3>
+      <p><span class="zh">「知识如何在正确的时间重新出现？」跨越 4 个项目、11 条笔记。</span><span class="en">"How does knowledge resurface at the right time?" — 4 projects, 11 notes.</span></p>
+      <span class="signal"><span class="zh">11 条关联笔记</span><span class="en">11 linked notes</span></span></div>
+    <div class="ins"><span class="eyebrow"><span class="zh">隐藏连接</span><span class="en">CONNECTION</span></span>
+      <h3><span class="zh">三个看似不同的项目，正在解决同一件事。</span><span class="en">Three projects, one hidden job.</span></h3>
+      <p><span class="zh">交易情报、内容工厂、个人知识库——都在把信号路由到正确的下一步。</span><span class="en">Trading intel, content factory, knowledge base — all routing signals to the next action.</span></p>
+      <span class="signal"><span class="zh">3 个项目交集</span><span class="en">3-project overlap</span></span></div>
+    <div class="ins"><span class="eyebrow"><span class="zh">观点矛盾</span><span class="en">CONTRADICTION</span></span>
+      <h3><span class="zh">你同时相信自动化，也不信任完全自动化。</span><span class="en">You trust automation — and don't.</span></h3>
+      <p><span class="zh">两组相反的笔记并不是冲突，而是一个尚未命名的产品原则。</span><span class="en">Two opposing note clusters aren't a conflict — they're an unnamed product principle.</span></p>
+      <span class="signal"><span class="zh">1 个未命名原则</span><span class="en">1 unnamed principle</span></span></div>
+  </div>
+  <div style="margin-top:18px">
+    <p class="sec-sub" style="margin-bottom:10px"><span class="zh">8 个分析 Lens（洞察的取景器）：</span><span class="en">The 8 analysis lenses:</span></p>
+    <div class="lenses">
+      <div class="lens"><b><span class="zh">观点演化</span><span class="en">Evolution</span></b><span><span class="zh">观点如何改变</span><span class="en">how views change</span></span></div>
+      <div class="lens"><b><span class="zh">反复问题</span><span class="en">Recurring</span></b><span><span class="zh">没消失的问题</span><span class="en">questions that persist</span></span></div>
+      <div class="lens"><b><span class="zh">隐藏连接</span><span class="en">Connection</span></b><span><span class="zh">跨项目共性</span><span class="en">cross-project links</span></span></div>
+      <div class="lens"><b><span class="zh">观点矛盾</span><span class="en">Contradiction</span></b><span><span class="zh">并置相反观点</span><span class="en">juxtaposed views</span></span></div>
+      <div class="lens"><b><span class="zh">决策形成</span><span class="en">Decision</span></b><span><span class="zh">决定如何产生</span><span class="en">how decisions form</span></span></div>
+      <div class="lens"><b><span class="zh">问题质量</span><span class="en">Question</span></b><span><span class="zh">高杠杆问题</span><span class="en">high-leverage questions</span></span></div>
+      <div class="lens"><b><span class="zh">认知盲点</span><span class="en">Blindspot</span></b><span><span class="zh">沉默与遗漏</span><span class="en">silences and gaps</span></span></div>
+      <div class="lens"><b><span class="zh">行为模式</span><span class="en">Pattern</span></b><span><span class="zh">可复用的工作法</span><span class="en">reusable methods</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="sec-no">03 · EVIDENCE TRACE</div>
+  <h2><span class="zh">每条洞察都有<em>证据链</em></span><span class="en">Every insight carries its evidence</span></h2>
+  <div class="ev" style="margin-top:22px">
+    <div class="ev-card">
+      <b class="hl"><span class="zh">证据长什么样</span><span class="en">What evidence looks like</span></b>
+      <p><span class="zh">每条 insight 必须提供 evidence[]：来源 note id + 日期 + 原文摘录。以「观点演化」为例：</span>
+      <span class="en">Each insight must provide evidence[]: source note id + date + verbatim quote. Example from "Evolution":</span></p>
+      <div class="ev-quote">「我总想先搭好完整的平台，再开始验证真正的需求。」<i>N-014 · 2023-04-18</i></div>
+      <div class="ev-quote">「把一次性交付拆成可复用链路，反而更快。」<i>N-026 · 2023-09-02</i></div>
+      <div class="ev-quote">「让机器持续发现，让人负责确认和承诺。」<i>N-089 · 2025-03-08</i></div>
+      <p style="margin-top:12px"><span class="zh">在 Demo 里点开洞察卡，证据可跳回对应笔记——结论不悬空。</span>
+      <span class="en">In the demo, insights link back to their notes — no floating conclusions.</span></p>
+    </div>
+    <div>
+      <div class="ev-card">
+        <b class="hl"><span class="zh">诚实边界</span><span class="en">Honest boundary</span></b>
+        <p><span class="zh">页面中的全部笔记与洞察均明确标记为 <b>Synthetic Demo Vault</b>——不是真实用户数据，也不暗示当前已有真实模型结果。</span>
+        <span class="en">All notes and insights are explicitly marked <b>Synthetic Demo Vault</b> — no real user data, no implied real-model results.</span></p>
+        <p><span class="zh">这是产品展示层，不修改任何 Notes Insight 插件核心逻辑。</span>
+        <span class="en">A presentation layer only — the plugin's core logic is untouched.</span></p>
+      </div>
+      <div class="honest"><span class="zh"><b>设计约束</b>：蓝色为唯一强调色；卡片与证据链优先、减少装饰性 UI；支持 light/dark，默认跟随系统。</span>
+      <span class="en"><b>Design constraints</b>: blue as the only accent; cards and evidence chains over decoration; light/dark following system.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="integrate">
+  <div class="sec-no">04 · INTEGRATE</div>
+  <h2><span class="zh">接入真实数据：<em>边界清晰</em></span><span class="en">Plugging in real data — clean boundaries</span></h2>
+  <div class="steps" style="margin-top:22px">
+    <div class="step"><i>RULE 1</i><div><p><span class="zh">插件核心负责采集、检索、排序、生成结构化 insight；页面只消费一个经过校验的 JSON，不直接读 Vault。</span><span class="en">The plugin core collects, ranks and emits structured insights; the page consumes one validated JSON — never the raw vault.</span></p></div></div>
+    <div class="step"><i>RULE 2</i><div><p><span class="zh">每条 insight 必须带 <code>evidence[]</code>（note id + 日期 + 原文摘录），保证可审计。</span><span class="en">Every insight carries evidence[] (note id + date + quote) for auditability.</span></p></div></div>
+    <div class="step"><i>RULE 3</i><div><p><span class="zh">真实用户数据要加鉴权、脱敏与明确的 consent boundary。</span><span class="en">Real user data requires auth, redaction and an explicit consent boundary.</span></p></div></div>
+    <div class="step"><i>RULE 4</i><div><p><span class="zh">把 <code>src/data/demoData.js</code> 换成 API adapter（如 <code>insightApi.js</code>），别把请求逻辑塞进展示组件。</span><span class="en">Swap demoData.js for an API adapter (insightApi.js) — don't wire requests into view components.</span></p></div></div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="sec-no">05 · FAQ</div>
+  <h2><span class="zh">常见问题 · 四问速览</span><span class="en">FAQ · The four questions</span></h2>
+  <div class="faq" style="margin-top:22px">
+    <details class="faq-item" open>
+      <summary><span class="qm">Q.1</span><span class="qt"><span class="zh">解决什么问题？</span><span class="en">What problem does it solve?</span></span><span class="qc">＋</span></summary>
+      <div class="qa"><span class="zh">笔记工具都擅长「存」，没人在「回看」时帮你发现：观点怎么变的、什么问题一直没消失、哪些项目暗中相连。Notes Insight 把回看变成主动发现。</span><span class="en">Note tools store; none notice for you on revisit — how views shifted, which questions never died, which projects secretly connect. Notes Insight makes revisit active.</span></div>
+    </details>
+    <details class="faq-item">
+      <summary><span class="qm">Q.2</span><span class="qt"><span class="zh">什么场景用？得到什么结果？</span><span class="en">Scenario and outcome?</span></span><span class="qc">＋</span></summary>
+      <div class="qa"><span class="zh">产品详情页 + 可交互 demo：投资人/用户 30 秒看懂产品主张，每条洞察点开就有证据链。内容团队另有 CONTENT_PRODUCTION_PACK.md（视频脚本、分镜、素材清单）。</span><span class="en">A product page + interactive demo: 30 seconds to get the thesis, evidence one click away. Content teams get CONTENT_PRODUCTION_PACK.md (scripts, storyboard, assets).</span></div>
+    </details>
+    <details class="faq-item">
+      <summary><span class="qm">Q.3</span><span class="qt"><span class="zh">内部是什么结构？</span><span class="en">How is it structured?</span></span><span class="qc">＋</span></summary>
+      <div class="qa"><span class="zh">Vite + React，三件套：main.jsx（页面组装与交互）、styles.css（明暗主题 + 响应式）、data/demoData.js（合成笔记 + 洞察输出：6 笔记 / 4 洞察 / 8 Lens）。替换 demoData 即接真实数据。</span><span class="en">Vite + React, three files: main.jsx (composition), styles.css (themes), data/demoData.js (synthetic notes + insights: 6 notes / 4 insights / 8 lenses). Swap demoData to go real.</span></div>
+    </details>
+    <details class="faq-item">
+      <summary><span class="qm">Q.4</span><span class="qt"><span class="zh">能复用什么？</span><span class="en">What can you reuse?</span></span><span class="qc">＋</span></summary>
+      <div class="qa"><span class="zh">① insight 数据形状（id/type/summary/evidence[]）可直接当产品设计模板；② 「Synthetic Demo Vault」的诚实展示法——用合成数据 demo 产品又明示边界；③ 洞察→证据跳转的交互模式；④ CONTENT_PRODUCTION_PACK 的内容生产模板。</span><span class="en">The insight shape (id/type/summary/evidence[]), the honest synthetic-demo pattern, evidence-trace interactions, and the content production pack.</span></div>
+    </details>
+  </div>
+</section>
+
+<footer><div class="fm">
+  <div><b style="color:var(--ink2)">sera-notes-insight-demo</b> · <span class="zh">公开产品 demo</span><span class="en">public product demo</span></div>
+  <div><span class="zh">洞察文案逐字取自 src/data/demoData.js（Observed）；数据为 Synthetic Demo Vault</span><span class="en">Insight copy verbatim from demoData.js (Observed); data is synthetic</span></div>
+</div></footer>
+</div>
+
+<script>
+const lang=()=>document.documentElement.dataset.lang;
+function setLang(l){document.documentElement.dataset.lang=l;localStorage.setItem("sni-lang",l);
+ document.getElementById("lang-zh").classList.toggle("on",l==="zh");
+ document.getElementById("lang-en").classList.toggle("on",l==="en");}
+function setTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem("sni-theme",t);
+ document.getElementById("th-light").classList.toggle("on",t==="light");
+ document.getElementById("th-dark").classList.toggle("on",t==="dark");}
+(function boot(){
+ const q=new URLSearchParams(location.search);
+ setTheme(q.get("theme")||localStorage.getItem("sni-theme")||"light");
+ setLang(q.get("lang")||localStorage.getItem("sni-lang")||(navigator.language.startsWith("zh")?"zh":"en"));
+ document.getElementById("demo-iframe").src="index.html";
+})();
+</script>
+</body>
+</html>
